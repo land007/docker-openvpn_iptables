@@ -9,7 +9,18 @@ iptables -P FORWARD DROP
 iptables -A INPUT -p tcp --dport 6379 -j ACCEPT
 iptables -A OUTPUT -p tcp --sport 6379 -j ACCEPT
 #开启UDP
-iptables -A INPUT -p udp --destination-port 1194 -j ACCEPT
+iptables -A INPUT -p udp -m state --state NEW,ESTABLISHED --dport 1194 -j ACCEPT
+iptables -A OUTPUT -p udp -m state --state ESTABLISHED --sport 1194 -j ACCEPT
+iptables -A INPUT -i tun0 -j ACCEPT
+iptables -A OUTPUT -o tun0 -j ACCEPT
+#iptables -A FORWARD -i tun0 -j ACCEPT
+#iptables -A FORWARD -i tun0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i tun0 -s 192.168.255.0/24 -d ${LANIP}/24 -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth0 -o tun+ -m state --state RELATED,ESTABLISHED -j ACCEPT
+#iptables -A FORWARD -i tun0 -o eth0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT          
+#iptables -A FORWARD -i eth0 -o tun0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+#drop client to client
+iptables -A FORWARD -i tun0 -s 192.168.255.0/24 -d 192.168.255.0/24 -j DROP
 #允许ping
 iptables -A INPUT -p icmp -j ACCEPT
 iptables -A OUTPUT -p icmp -j ACCEPT
