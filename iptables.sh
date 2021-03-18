@@ -15,7 +15,11 @@ iptables -A INPUT -i tun0 -j ACCEPT
 iptables -A OUTPUT -o tun0 -j ACCEPT
 #iptables -A FORWARD -i tun0 -j ACCEPT
 #iptables -A FORWARD -i tun0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
-iptables -A FORWARD -i tun0 -s 192.168.255.0/24 -d ${LANIP}/24 -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT
+#iptables -A FORWARD -i tun0 -s 192.168.255.0/24 -d ${LANIP}/24 -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT
+for I_LANIP in ${LANIP}; do
+  echo "iptables -A FORWARD -i tun0 -s 192.168.255.0/24 -d ${I_LANIP}/24 -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT"
+  iptables -A FORWARD -i tun0 -s 192.168.255.0/24 -d ${I_LANIP}/24 -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT
+done
 iptables -A FORWARD -i eth0 -o tun+ -m state --state RELATED,ESTABLISHED -j ACCEPT
 #iptables -A FORWARD -i tun0 -o eth0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT          
 #iptables -A FORWARD -i eth0 -o tun0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
@@ -27,7 +31,11 @@ iptables -A OUTPUT -p icmp -j ACCEPT
 #开启对指定网站的访问
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 #iptables -A OUTPUT -m state --state NEW,ESTABLISHED,RELATED -p tcp -d 172.17.0.1/24 -j ACCEPT
-iptables -A OUTPUT -m state --state NEW,ESTABLISHED,RELATED -p tcp -d ${LANIP}/24 -j ACCEPT
+#iptables -A OUTPUT -m state --state NEW,ESTABLISHED,RELATED -p tcp -d ${LANIP}/24 -j ACCEPT
+for I_LANIP in ${LANIP}; do
+  echo "iptables -A OUTPUT -m state --state NEW,ESTABLISHED,RELATED -p tcp -d ${I_LANIP}/24 -j ACCEPT"
+  iptables -A OUTPUT -m state --state NEW,ESTABLISHED,RELATED -p tcp -d ${I_LANIP}/24 -j ACCEPT
+done
 #允许环回
 iptables -A INPUT -i lo -p all -j ACCEPT
 iptables -A OUTPUT -o lo -p all -j ACCEPT
