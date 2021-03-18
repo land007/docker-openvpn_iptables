@@ -1,3 +1,5 @@
+#!/bin/bash
+export IFS=";"
 iptables -F
 iptables -X
 iptables -Z
